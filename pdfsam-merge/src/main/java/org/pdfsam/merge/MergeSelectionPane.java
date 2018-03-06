@@ -32,8 +32,10 @@ import org.pdfsam.ui.selection.multiple.LongColumn;
 import org.pdfsam.ui.selection.multiple.MultipleSelectionPane;
 import org.pdfsam.ui.selection.multiple.PageRangesColumn;
 import org.pdfsam.ui.selection.multiple.SelectionTableColumn;
+import org.pdfsam.ui.selection.multiple.SelectionTableRowData;
 import org.sejda.conversion.exception.ConversionException;
 import org.sejda.model.input.PdfMergeInput;
+import org.sejda.model.pdf.page.PageRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +59,18 @@ public class MergeSelectionPane extends MultipleSelectionPane
     @Override
     public void apply(MergeParametersBuilder builder, Consumer<String> onError) {
         try {
-            table().getItems().stream().filter(s -> !Objects.equals("0", trim(s.pageSelection.get())))
-                    .map(i -> new PdfMergeInput(i.descriptor().toPdfFileSource(), i.toPageRangeSet()))
-                    .forEach(builder::addInput);
+        	for(SelectionTableRowData rowData : table().getItems()) {
+        		if(!Objects.equals("0", trim(rowData.pageSelection.get()))) {
+        			for(PageRange range : rowData.toPageRangeSet()) {
+        				PdfMergeInput input = new PdfMergeInput(rowData.descriptor().toPdfFileSource());
+        				input.addPageRange(range);
+						builder.addInput(input);
+        			}
+        		}
+        	}
+//            table().getItems().stream().filter(s -> !Objects.equals("0", trim(s.pageSelection.get())))
+//                    .map(i -> new PdfMergeInput(i.descriptor().toPdfFileSource(), i.toPageRangeSet()))
+//                    .forEach(builder::addInput);
             if (!builder.hasInput()) {
                 onError.accept(DefaultI18nContext.getInstance().i18n("No PDF document has been selected"));
             }

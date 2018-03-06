@@ -62,7 +62,7 @@ class SelectionTableToolbar extends ToolBar implements ModuleOwned {
         this.ownerModule = defaultString(ownerModule);
         getItems().addAll(new AddButton(ownerModule), new ClearButton(ownerModule), new RemoveButton(ownerModule));
         if (canMove) {
-            getItems().addAll(new MoveUpButton(ownerModule), new MoveDownButton(ownerModule));
+            getItems().addAll(new MoveTopButton(ownerModule), new MoveUpButton(ownerModule), new MoveDownButton(ownerModule), new MoveBottomButton(ownerModule));
         }
         getStyleClass().add("selection-tool-bar");
     }
@@ -210,4 +210,23 @@ class SelectionTableToolbar extends ToolBar implements ModuleOwned {
             setText(DefaultI18nContext.getInstance().i18n("Move _Down"));
         }
     }
+
+    static class MoveTopButton extends BaseMoveSelectedButton {
+
+        public MoveTopButton(String ownerModule) {
+            super(ownerModule, MoveType.TOP);
+            setTooltip(new Tooltip(DefaultI18nContext.getInstance().i18n("Moves selected documents to the top")));
+            setText(DefaultI18nContext.getInstance().i18n("Move _Top"));
+        }
+    }
+
+    static class MoveBottomButton extends BaseMoveSelectedButton {
+
+        public MoveBottomButton(String ownerModule) {
+            super(ownerModule, MoveType.BOTTOM);
+            setTooltip(new Tooltip(DefaultI18nContext.getInstance().i18n("Moves selected documents to the bottom")));
+            setText(DefaultI18nContext.getInstance().i18n("Move _Bottom"));
+        }
+    }
+
 }
