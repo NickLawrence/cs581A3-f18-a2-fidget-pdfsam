@@ -45,9 +45,9 @@ import org.sejda.model.pdf.PdfVersion;
  */
 public class PdfDocumentDescriptor {
 
-    private ObservableAtomicReference<PdfDescriptorLoadingStatus> loadingStatus = new ObservableAtomicReference<>(
+    private PdfDocumentDescriptorReference pdfDocumentDescriptorReference = new PdfDocumentDescriptorReference();
+	private ObservableAtomicReference<PdfDescriptorLoadingStatus> loadingStatus = new ObservableAtomicReference<>(
             PdfDescriptorLoadingStatus.INITIAL);
-    private AtomicInteger references = new AtomicInteger(1);
     private ObservableAtomicReference<Integer> pages = new ObservableAtomicReference<>(0);
     private String password;
     private File file;
@@ -151,26 +151,25 @@ public class PdfDocumentDescriptor {
      *         on the descriptor that it should be ignored since not relevant anymore.
      */
     public boolean hasReferences() {
-        return references.get() > 0;
+        return pdfDocumentDescriptorReference.hasReferences();
     }
 
     /**
      * @return true if the descriptor has become invalid because of the release
      */
     public boolean release() {
-        return this.references.decrementAndGet() <= 0;
+        return pdfDocumentDescriptorReference.release();
     }
 
     public void releaseAll() {
-        this.references.set(0);
+        pdfDocumentDescriptorReference.releaseAll();
     }
 
     /**
      * Increment the number of reference
      */
     public PdfDocumentDescriptor retain() {
-        this.references.incrementAndGet();
-        return this;
+        return pdfDocumentDescriptorReference.retain(this);
     }
 
     public static PdfDocumentDescriptor newDescriptor(File file, String password) {
