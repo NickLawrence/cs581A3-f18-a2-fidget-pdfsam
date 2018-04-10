@@ -91,29 +91,25 @@ public class OverwriteDialogController {
 
     private void onDirectory(AbstractParameters params, File dir) {
         if (isNotEmpty(dir.listFiles())) {
-            if (!dialog.get().title(DefaultI18nContext.getInstance().i18n("Directory not empty"))
-                    .messageTitle(DefaultI18nContext.getInstance().i18n("The selected directory is not empty"))
-                    .messageContent(DefaultI18nContext.getInstance()
-                            .i18n("Overwrite files with the same name as the generated ones?"))
-                    .response()) {
-                throw new BroadcastInterruptionException(
-                        DefaultI18nContext.getInstance().i18n("Don't overwrite existing file"));
-            }
-            LOG.trace("Enabling overwrite of the existing output file");
-            params.setExistingOutputPolicy(ExistingOutputPolicy.OVERWRITE);
+            handleOverwrite(params, "Directory not empty", "The selected directory is not empty", "Overwrite files with the same name as the generated ones?");
         }
     }
 
     private void onFile(AbstractParameters params, File file) {
         if (file.exists()) {
-            if (!dialog.get().title(DefaultI18nContext.getInstance().i18n("Overwrite confirmation"))
-                    .messageTitle(DefaultI18nContext.getInstance().i18n("A file with the given name already exists"))
-                    .messageContent(DefaultI18nContext.getInstance().i18n("Do you want to overwrite it?")).response()) {
-                throw new BroadcastInterruptionException(
-                        DefaultI18nContext.getInstance().i18n("Don't overwrite existing file"));
-            }
-            LOG.trace("Enabling overwrite of the existing output file");
-            params.setExistingOutputPolicy(ExistingOutputPolicy.OVERWRITE);
+            handleOverwrite(params, "Overwrite confirmation", "A file with the given name already exists", "Do you want to overwrite it?");
         }
     }
+    
+    private void handleOverwrite(AbstractParameters params, String title, String message, String confirmation) {
+    	if (!dialog.get().title(DefaultI18nContext.getInstance().i18n(title))
+                .messageTitle(DefaultI18nContext.getInstance().i18n(message))
+                .messageContent(DefaultI18nContext.getInstance().i18n(confirmation)).response()) {
+            throw new BroadcastInterruptionException(
+                    DefaultI18nContext.getInstance().i18n("Don't overwrite existing file"));
+        }
+        LOG.trace("Enabling overwrite of the existing output file");
+        params.setExistingOutputPolicy(ExistingOutputPolicy.OVERWRITE);
+    }
+    
 }
